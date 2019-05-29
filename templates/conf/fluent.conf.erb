@@ -401,8 +401,8 @@
   @type tail
   format json
   time_key time
-  path /var/log/kube-audit
-  pos_file /var/log/kube-audit.pos
+  path /var/log/kube-apiserver-audit.log
+  pos_file /var/log/kube-apiserver-audit.log.pos
   time_format %Y-%m-%dT%H:%M:%S.%NZ
   tag audit
   read_from_head false
