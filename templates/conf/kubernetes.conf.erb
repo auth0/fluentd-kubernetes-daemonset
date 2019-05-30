@@ -227,7 +227,7 @@
   multiline_flush_interval 5s
   path /var/log/kubernetes/kube-apiserver-audit.log
   pos_file /var/log/kube-apiserver-audit.log.pos
-  tag kube-apiserver-audit
+  tag audit
 <% if is_v1 %>
   <parse>
     @type multiline
@@ -254,6 +254,12 @@
   time_format %FT%T.%L%Z
 <% end %>
 </source>
+
+<match audit.**>
+  @type sumologic
+  endpoint "#{ENV['SUMOLOGIC_HOST']}"
+  log_format json
+</match>
 
 <filter kubernetes.**>
   @type kubernetes_metadata
