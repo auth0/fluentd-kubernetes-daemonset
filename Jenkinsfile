@@ -53,7 +53,7 @@ pipeline {
         script {
           withDockerRegistry(getArtifactoryRegistry()) {
             docker.image("${DOCKER_REPO}:${DOCKER_TAG}").push('latest')
-            sh "make tags push IMAGE_NAME=${DOCKER_REPO}"
+            sh "make tags push VERSION=${DOCKER_TAG} IMAGE_NAME=${DOCKER_REPO}"
           }
         }
       }
