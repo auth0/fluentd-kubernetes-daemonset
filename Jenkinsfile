@@ -5,6 +5,7 @@ pipeline {
 
   environment { // This block defines environment variables that will be available throughout the rest of the pipeline
     SERVICE_NAME = 'fluentd-kubernetes-daemonset'
+    DOCKERFILE = 'v1.4/debian-datadog'
   }
 
   options {
@@ -31,14 +32,16 @@ pipeline {
           DOCKER_REGISTRY = getDockerRegistry()
           DOCKER_REPO = "${DOCKER_REGISTRY}/${env.SERVICE_NAME}"
           DOCKER_TAG = getDockerTag()
-          sh "docker build --force-rm -t ${DOCKER_REPO}:${DOCKER_TAG} docker-image/v1.3/debian-datadog/"
+          sh "make image tags no-cache=yes IMAGE_NAME=${DOCKER_REPO} TAGS=${DOCKER_TAG} DOCKERFILE=${DOCKERFILE}"
         }
       }
     }
 
     stage('Push Docker Image') {
       steps {
-        dockerPushArtifactory(docker.image("${DOCKER_REPO}:${DOCKER_TAG}").id)
+        withDockerRegistry(getArtifactoryRegistry()) {
+          sh "make push IMAGE_NAME=${DOCKER_REPO} TAGS=${DOCKER_TAG}"
+        }
       }
     }
 
@@ -50,6 +53,7 @@ pipeline {
         script {
           withDockerRegistry(getArtifactoryRegistry()) {
             docker.image("${DOCKER_REPO}:${DOCKER_TAG}").push('latest')
+            sh "make tags push IMAGE_NAME=${DOCKER_REPO}"
           }
         }
       }
